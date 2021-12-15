@@ -2,18 +2,5 @@ streamlit==0.79.0
 pandas==1.2.4
 numpy==1.20.1
 scipy==1.6.2
-plotly==
-plotly_express==
-plotly.graph_objects==
-plotly.offline==
-plotly.express==
-math==
-time==
-plotly.figure_factory==
 matplotlib.pyplot==3.3.4
-base64==
-csv==
-pylab==
-sys==
-datetime==
 
