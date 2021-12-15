@@ -26,7 +26,7 @@ from plotly import tools
 #Título
 #col1, mid, col2 = st.columns([5,5,60])
 #with col1:
-#st.image('ANH.png', width=300)
+st.image('ANH.png', width=300)
     #st.image('FCYT.png', width=40)
 #with col2:
 st.title('Agencia Nacional de Hidrocarburos')
