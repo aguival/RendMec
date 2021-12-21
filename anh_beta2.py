@@ -45,12 +45,12 @@ num_nc = (st.sidebar.number_input("Nº de cilindros del motor"))
 num_rac = (st.sidebar.number_input("Relación aire combustible"))
 
 #CONSTANTES FÍSICAS
-st.sidebar.subheader("Constantes físicas")
-num_lambda = int(st.sidebar.number_input("Lambda"))
-num_cgi = int(st.sidebar.number_input("Constante de los Gases Ideales [kJ/kg·K]"))
-num_g = int(st.sidebar.number_input("Aceleración de la gravedad [m/s2]"))
-num_temp_amb = int(st.sidebar.number_input("Temperatura ambiente [ºC]"))
-num_pre_amb = int(st.sidebar.number_input("Presión ambiente [kPa]"))
+#st.sidebar.subheader("Constantes físicas")
+#num_lambda = int(st.sidebar.number_input("Lambda"))
+#num_cgi = int(st.sidebar.number_input("Constante de los Gases Ideales [kJ/kg·K]"))
+#num_g = int(st.sidebar.number_input("Aceleración de la gravedad [m/s2]"))
+#num_temp_amb = int(st.sidebar.number_input("Temperatura ambiente [ºC]"))
+#num_pre_amb = int(st.sidebar.number_input("Presión ambiente [kPa]"))
 num_cp = int(st.sidebar.number_input("Calor específico del aire a presión constante [kJ/kg·K]"))
 num_cv = int(st.sidebar.number_input("Calor específico del aire a volumen constante [kJ/kg·K]"))
 
@@ -63,19 +63,19 @@ num_alt = (st.sidebar.number_input("Ingrese altitud [km]"))
 #OTROS DATOS PARA EL FUNCIONAMIENTO DEL MOTOR
 st.sidebar.subheader("Funcionamiento del motor")
 num_poder_cal_comb = int(st.sidebar.number_input("Poder calorífico del combustible [kJ/kg]"))
-num_rend_comb = int(st.sidebar.number_input("Rendimiento de la combustión"))
-num_rend_mec = int(st.sidebar.number_input("Rendimiento mecanico"))
-num_reg_giro_motor = int(st.sidebar.number_input("Regimen de giro del motor [RPM]"))
-num_porc_res_comb = int(st.sidebar.number_input("Porcentaje de residuos de combustión"))
+#num_rend_comb = int(st.sidebar.number_input("Rendimiento de la combustión"))
+#num_rend_mec = int(st.sidebar.number_input("Rendimiento mecanico"))
+#num_reg_giro_motor = int(st.sidebar.number_input("Regimen de giro del motor [RPM]"))
+#num_porc_res_comb = int(st.sidebar.number_input("Porcentaje de residuos de combustión"))
 num_giro_nom_mot = int(st.sidebar.number_input("Giro nominal del motor [RPM]"))
 option = st.sidebar.selectbox(
     'Seleccione los tiempos del motor',
      ('dos tiempos', 'cuatro tiempos'))
 
 #VARIABLES FIJAS
-st.sidebar.subheader("Variables fijas")
-num_pres_nmar = int(st.sidebar.number_input("Presión a nivel del mar [kPa]"))
-num_temp_nmar = int(st.sidebar.number_input("Temperatura a nivel del mar [ºC]"))
+#st.sidebar.subheader("Variables fijas")
+#num_pres_nmar = int(st.sidebar.number_input("Presión a nivel del mar [kPa]"))
+#num_temp_nmar = int(st.sidebar.number_input("Temperatura a nivel del mar [ºC]"))
 
 #TIPO DE ANÁLISIS QUE DESEA OBTENER
 st.sidebar.subheader("Seleccione el tipo de análisis que desea obtener")
@@ -139,7 +139,7 @@ if st.sidebar.button('Geometría y dinámica del motor'):
     def load_data(nrows):
         data = pd.read_csv('pos4.csv', nrows=nrows)
         return data
-    data_load_state = st.text('Loading data...')
+    #data_load_state = st.text('Loading data...')
     weekly_data = load_data(360)
     st.subheader('Posición del pistón')
     st.write(weekly_data)
@@ -288,13 +288,59 @@ if st.sidebar.button('Termodinámica del motor'):
         #Cálculo del volumen específico de compresión
         Vc=Va/Epsilon_ta
         st.write('El volumen específico de compresión es', Vc, 'm3/kg')
+        #################################################
+        angulo_comp=340
+        angulo_doble=(2*angulo_comp*math.pi)/180
+        angulo_simple=(angulo_comp*math.pi)/180
+        V_ins=(Va/Epsilon_ta)*(((Epsilon_ta-1)/2)*(1+(1/RBM)-math.cos(angulo_simple)+(-1/RBM)*math.sqrt(1-(RBM*RBM)*((math.sin(angulo_simple))**2)))+1)
+        st.write('Volumen de punto de inflamación es', V_ins)
+        p_ins=((Va/V_ins)**n1)*Pa
+        st.write('Presión de punto de inflamación es', p_ins)
+        t_ins=Ta*((Va/V_ins)**(n1-1))
+        st.write('Temperatura de punto de inflamación es', t_ins)
+        
         #Cálculo del volumen específoc instantáneo
         
-        theta1=35
+        theta1=400
         theta=(theta1*math.pi)/180
-        #V_ins=(Va/Epsilon_ta)*(((Epsilon_ta-1)/2)*(1+(1/RBM)-math.cos(theta)+(-1/RBM)*math.sqrt(1-(RBM*RBM)*((math.sin(theta))**2)))+1)
-        #st.write('El volumen específico instantaneo es', V_ins)
-        
+        V_ins=(Va/Epsilon_ta)*(((Epsilon_ta-1)/2)*(1+(1/RBM)-math.cos(theta)+(-1/RBM)*math.sqrt(1-(RBM*RBM)*((math.sin(theta))**2)))+1)
+        st.write('El volumen específico instantaneo es', V_ins)
+         #aceleracion
+        angulo_comp=180
+        r=10
+        w=5
+        lamb=2
+        with open('compresion.csv', 'w', newline='') as  f:
+            writer = csv.writer(f)
+            list=["angulo","volumen","presion","temperatura"]
+            writer.writerow(list)
+            while angulo_comp<=340:
+                angulo_doble=(2*angulo_comp*math.pi)/180
+                angulo_simple=(angulo_comp*math.pi)/180
+                V_ins=(Va/Epsilon_ta)*(((Epsilon_ta-1)/2)*(1+(1/RBM)-math.cos(angulo_simple)+(-1/RBM)*math.sqrt(1-(RBM*RBM)*((math.sin(angulo_simple))**2)))+1)
+                p_ins=((Va/V_ins)**n1)*Pa
+                t_ins=Ta*((Va/V_ins)**(n1-1))
+                #Ap=-r*w*w*(math.cos(angulo_simple)+(lamb*math.cos(angulo_doble)))
+                #a=num_rc+i*50
+                list=[angulo_comp,V_ins,p_ins,t_ins]
+                #st.text(list)
+                writer.writerow(list)
+                angulo_comp=angulo_comp+1
+
+        def load_data(nrows):
+            data = pd.read_csv('compresion.csv', nrows=nrows)
+            return data
+        data_load_state = st.text('Loading data...')
+        weekly_data = load_data(160)
+        st.subheader('Volumen, Presión y Temperatura')
+        st.write(weekly_data)
+        df=pd.DataFrame(weekly_data[:160], columns=['volumen'])
+        df1=pd.DataFrame(weekly_data[:160], columns=['presion'])
+        df2=pd.DataFrame(weekly_data[:160], columns=['temperatura'])
+        #Bar Chart
+        st.line_chart(df)
+        st.line_chart(df1)
+        st.line_chart(df2)
 
     col1, mid, col2 = st.columns([10,2,10])
     with col1: 
@@ -328,7 +374,46 @@ if st.sidebar.button('Termodinámica del motor'):
         st.write('Calor específico total de la combustión es', qz, '[kJ/kg]')
         E2=0.002*qz*(num_rc/Va)
         st.write('E2 es', E2)
-        
+        I_D=13 #Tiempo de retardo
+        dia=0.116 #Relación estequiometrica
+        a=0.9
+        b=0.35
+        c=0.35
+        betha=1-((a**(dia**b))/(I_D**c))
+        st.write('Beta es', betha, '[kJ/kg]')
+        c1=2
+        c2=5000
+        c3=6.908
+        c4=1.4
+        dt=55
+        dt_comb=75
+        t=dt/dt_comb
+        st.write('tiempo es', t, 's')
+        f1=1-(1-(t**c1))**c2
+        st.write('f1 es',f1)
+        f2=1-math.exp(-c3*(t**c4))
+        st.write('f2 es', f2)
+        delta_X12=betha*f1+(1-betha)*f2
+        st.write('Delta X12 es', delta_X12)
+        x12=delta_X12/2
+        t12=(Ta+Tc)/2
+        K12=1.259+(76.7/t12)-(0.005+(0.0375/alfa_comb)*x12)
+        st.write('Factor de calores específicos', K12)
+        RBM=(2*num_lb)/num_lp
+        angulo_c=360
+        angulo_c1=(angulo_c*math.pi)/180
+        coef_ut1= 1+((num_rc-1)/2)*((1+(1/RBM))-(math.cos(angulo_c1)+(1/RBM)*math.sqrt(1-(RBM*RBM*(math.sin(angulo_c1))*(math.sin(angulo_c1))))))
+        st.write('Coeficiente de utilización de calor en el punto 1 es', coef_ut1)
+        angulo_c2=415
+        angulo_c2=(angulo_c2*math.pi)/180
+        coef_ut2= 1+((num_rc-1)/2)*((1+(1/RBM))-(math.cos(angulo_c2)+(1/RBM)*math.sqrt(1-(RBM*RBM*(math.sin(angulo_c2))*(math.sin(angulo_c1))))))
+        st.write('Coeficiente de utilización de calor en el punto 2 es', coef_ut2)
+        angulo_c3=340
+        angulo_c3=(angulo_c3*math.pi)/180
+        coef_ut3= 1+((num_rc-1)/2)*((1+(1/RBM))-(math.cos(angulo_c3)+(1/RBM)*math.sqrt(1-(RBM*RBM*(math.sin(angulo_c3))*(math.sin(angulo_c1))))))
+        st.write('Coeficiente de utilización de calor en el punto de inflamación es', coef_ut3)
+        p2=(E2*delta_X12+Pa*(K12*coef_ut1-coef_ut2))/(K12*coef_ut2-coef_ut1)
+        st.write('Presión de combustión es', p2)
 
 
         st.text('Presión')
@@ -367,7 +452,353 @@ if st.sidebar.button('Gráficas de simulación de motores diesel'):
     
 if st.sidebar.button('Resumen de cálculos'):
     st.subheader('RESUMEN DE CÁLCULOS')
-    st.text('sdhfdf ')
+    st.subheader('GEOMETRÍA')   
+        #Resultados - Geometría
+    
+
+    r_dp=num_dp/2
+    AreaPiston=(scipy.pi/4)*(r_dp*r_dp)
+    st.write('Área de Pistón', AreaPiston)
+    
+    RBS=(num_dp/num_lp)
+        #st.write('Relación Diámetro del Cilindro con la Carrera del Pistón', RBS)
+    RBM=(2*num_lb)/num_lp
+        #st.write('Relación Biela - Manivela', RBM)
+    Vd=(scipy.pi/4)*(num_dp*num_dp)*(num_lp)
+        #st.write("Volumen desplazado", Vd)
+    Vdtotal=num_nc*Vd
+        #st.write("Volumen desplazado total", Vdtotal)
+        #st.write("Relación de compresión", num_rc)
+    
+        #Up=2*num_lp*num_giro_nom_mot
+        #st.write("Up", Up)
+    if (num_rc<=1):
+        Vc="No calculable"
+            #st.write("Volumen de la cámara de combustión o volumen muerto", Vc)
+        VPMS=Vc
+            #st.write("Volumen en el punto muerto superior", VPMS)
+        VPMI="No calculable"
+            #st.write("Volumen en el punto muerto inferior", VPMI)
+    else:
+        Vc=Vd/(num_rc-1)
+            #st.write("Volumen de la cámara de combustión o volumen muerto", Vc)
+        VPMS=Vc
+            #st.write("Volumen en el punto muerto superior", VPMS)
+        VPMI=Vc+Vd
+            #st.write("Volumen en el punto muerto inferior", VPMI)
+    w=((2*scipy.pi)/60)*num_giro_nom_mot
+    st.write("Velocidad angular del cigüeñal", w)
+
+    
+              
+
+        #Resultados Dinámica del Pistón
+
+    angulo=0
+    r=num_lp/2
+    lamb=r/num_lb
+    with open('pos4.csv', 'w', newline='') as  f:
+        writer = csv.writer(f)
+        list=["angulo","posicion"]
+        writer.writerow(list)
+        while angulo<=360:
+            angulo_doble=(2*angulo*math.pi)/180
+            angulo_simple=(angulo*math.pi)/180
+            Xp=r*(((lamb/4)*(1-math.cos(angulo_doble)))+(1-math.cos(angulo_simple)))
+                #a=num_rc+i*50
+            list=[angulo,Xp]
+               #st.text(list)
+            writer.writerow(list)
+            angulo=angulo+1
+
+    def load_data(nrows):
+        data = pd.read_csv('pos4.csv', nrows=nrows)
+        return data
+        #data_load_state = st.text('Loading data...')
+    weekly_data = load_data(360)
+    st.write('POSICIÓN DEL PISTÓN')
+        #st.write(weekly_data)
+    df=pd.DataFrame(weekly_data[:360], columns=['posicion'])
+        #Bar Chart
+    st.line_chart(df)
+
+     
+        #velocidad
+    angulo1=0
+    with open('velocidad1.csv', 'w', newline='') as  f:
+        writer = csv.writer(f)
+        list=["angulo","velocidad"]
+        writer.writerow(list)
+        while angulo1<=360:
+            angulo_doble=(2*angulo1*math.pi)/180
+            angulo_simple=(angulo1*math.pi)/180
+            Vp=r*w*((lamb/2)*math.sin(angulo_doble)+math.sin(angulo_simple))
+                #a=num_rc+i*50
+            list=[angulo1,Vp]
+                #st.text(list)
+            writer.writerow(list)
+            angulo1=angulo1+1
+
+    def load_data(nrows):
+        data = pd.read_csv('velocidad1.csv', nrows=nrows)
+        return data
+        #data_load_state = st.text('Loading data...')
+    weekly_data = load_data(360)
+    st.write('VELOCIDAD DEL PISTON')
+        #st.write(weekly_data)
+    df=pd.DataFrame(weekly_data[:360], columns=['velocidad'])
+        #Bar Chart
+    st.line_chart(df)
+        #Gráficas
+        
+        #aceleracion
+    angulo2=0
+    with open('aceleracion1.csv', 'w', newline='') as  f:
+        writer = csv.writer(f)
+        list=["angulo","aceleracion"]
+        writer.writerow(list)
+        while angulo2<=360:
+            angulo_doble=(2*angulo2*math.pi)/180
+            angulo_simple=(angulo2*math.pi)/180
+            Ap=-r*w*w*(math.cos(angulo_simple)+(lamb*math.cos(angulo_doble)))
+            #a=num_rc+i*50
+            list=[angulo2,Ap]
+            #st.text(list)
+            writer.writerow(list)
+            angulo2=angulo2+1
+
+    def load_data(nrows):
+        data = pd.read_csv('aceleracion1.csv', nrows=nrows)
+        return data
+        #data_load_state = st.text('Loading data...')
+    weekly_data = load_data(360)
+    st.write('ACELERACIÓN DE PISTÓN')
+        #st.write(weekly_data)
+    df=pd.DataFrame(weekly_data[:360], columns=['aceleracion'])
+        #Bar Chart
+    st.line_chart(df)
+    
+    st.subheader('TERMODINÁMICA')   
+    RBM=(num_dp/num_lp)
+    #=((2*num_lb)/num_lp)
+    #st.write('Relación Biela - Manivela', RBM)
+    gravedad=9.8 #Unidades N/Kg
+    Po=101.325 #Unidades kPa
+    dens_aire0=1.2250
+    R=287 #Unidades m2/s2K
+    num_a=-6.5
+    num_t0=298.15
+    num_t1=num_t0+num_a*(num_alt)
+    num_t2=num_t1-273.15
+    st.write('La temperatura es', num_t2, 'ºC es a una altura de', num_alt, 'km')
+
+    dens_aire=dens_aire0*((num_t1/num_t0)**(-1-(gravedad/(num_a*R)))) #Unidades kg/m3
+    st.write('La densidad', dens_aire, 'kg/m3 es a una altura de', num_alt, 'km')
+    alfa=(dens_aire*gravedad)/Po
+    #st.write('Valor de alfa =', alfa, '1/m')
+    num_pres1=Po*math.exp(-alfa*num_alt)
+    st.write('La presión', num_pres1, 'kPa es a una altura de', num_alt, 'km')
+    
+    Cp=1005
+
+    
+
+    #temp_comp=15+273.15
+    #num_t1_g=num_t
+    #st.write('Temperatura a la altura de', num_alt, 'es de', num_t1_g)
+
+
+
+    
+        #PROCESO DE ADMISIÓN
+    st.subheader('1. Proceso de Admisión')
+        #CALCULO DE LA PRESIÓN DE ADMISIÓN
+    Pk=2*num_pres1*0.001 #MPa
+        #st.write('Presión Pk es', Pk, 'MPa')
+    kn=3.25 #Coeficiente total que se encuentra entre el rango de 2.5 a 4 la formula es beta2+epsilon
+        #st.write('kn es igual a', kn)
+    Wad=50 #Velocidad media del aire en los motores diesel está en el rango de 30 a 70 m/s
+        #st.write('La velocidad media del aire es', Wad, 'm/s')
+        #Se debe seleccionar el coeficiente polintrópico de compresión del compresor 
+    nk=1.5
+    Tk=num_t1*((Pk/(num_pres1*0.001))**((nk-1)/nk))
+    st.write('Tk es', Tk, 'K')
+    dens_k=((28.96*Pk)/(8314*Tk))*(10**6)
+    st.write('La densidad es', dens_k)
+    Pa= Pk-(kn*((Wad**2)/2)*dens_k*(10**(-6)))
+    st.write('Presión de admisión es', Pa, 'MPa')
+
+        #CÁLCULO DE LA TEMPERATURA DE ADMISIÓN
+    delta_t=2.5 #K
+    Tr=800 #El valor está entre 700 a 900
+    Epsilon_ta=num_rc #Valor asumido
+    Pr=0.94*Pk #Presion de gases residuales la formula es (0.75 - 0.98)Pk
+    st.write('Presión de gases residuales es', Pr)
+    Yr=((Tk+delta_t)/Tr)*(Pr/((Epsilon_ta*Pa)-Pr))
+    st.write('Coeficiente de gases residuales igual a', Yr)
+    Ta=(Tk+delta_t+(Yr*Tr))/(1+Yr)
+    st.write('Temperatura de admisión es', Ta, 'K')
+
+        #CÁLCULO DEL VOLUMEN ESPECÍFICO DE ADMISIÓN
+    Ua=28.8503 #Kg/kMol es la Masa molar del aire
+    Va=0.008314* (Ta/(Ua*Pa))
+    st.write('El volumen específico de admisión es', Va)
+        
+    
+        #PROCESO DE COMPRESIÓN
+    st.subheader('3. Proceso de Compresión')
+        #Cálculo de presión de compresión
+    n1=1.35 #Coeficiente politrópico su valor está entre 1.32 - 1.39
+    Pc=Pa*Epsilon_ta**n1
+    st.write('La presión de compresión es', Pc, 'MPa')
+        #Cálculo de temperatura de compresion
+    Tc=Ta*Epsilon_ta**(n1-1)
+    st.write('La temperatura de compresión es', Tc, 'K')
+        #Cálculo del volumen específico de compresión
+    Vc=Va/Epsilon_ta
+    st.write('El volumen específico de compresión es', Vc, 'm3/kg')
+        #################################################
+    angulo_comp=340
+    angulo_doble=(2*angulo_comp*math.pi)/180
+    angulo_simple=(angulo_comp*math.pi)/180
+    V_ins=(Va/Epsilon_ta)*(((Epsilon_ta-1)/2)*(1+(1/RBM)-math.cos(angulo_simple)+(-1/RBM)*math.sqrt(1-(RBM*RBM)*((math.sin(angulo_simple))**2)))+1)
+        #st.write('Volumen de punto de inflamación es', V_ins)
+    p_ins=((Va/V_ins)**n1)*Pa
+        #st.write('Presión de punto de inflamación es', p_ins)
+    t_ins=Ta*((Va/V_ins)**(n1-1))
+    st.write('Temperatura de punto de inflamación es', t_ins)
+        
+        #Cálculo del volumen específoc instantáneo
+        
+    theta1=400
+    theta=(theta1*math.pi)/180
+    V_ins=(Va/Epsilon_ta)*(((Epsilon_ta-1)/2)*(1+(1/RBM)-math.cos(theta)+(-1/RBM)*math.sqrt(1-(RBM*RBM)*((math.sin(theta))**2)))+1)
+    st.write('El volumen específico instantaneo es', V_ins)
+         #aceleracion
+    angulo_comp=180
+    r=10
+    w=5
+    lamb=2
+    with open('compresion.csv', 'w', newline='') as  f:
+        writer = csv.writer(f)
+        list=["angulo","volumen","presion","temperatura"]
+        writer.writerow(list)
+        while angulo_comp<=340:
+            angulo_doble=(2*angulo_comp*math.pi)/180
+            angulo_simple=(angulo_comp*math.pi)/180
+            V_ins=(Va/Epsilon_ta)*(((Epsilon_ta-1)/2)*(1+(1/RBM)-math.cos(angulo_simple)+(-1/RBM)*math.sqrt(1-(RBM*RBM)*((math.sin(angulo_simple))**2)))+1)
+            p_ins=((Va/V_ins)**n1)*Pa
+            t_ins=Ta*((Va/V_ins)**(n1-1))
+                #Ap=-r*w*w*(math.cos(angulo_simple)+(lamb*math.cos(angulo_doble)))
+             #a=num_rc+i*50
+            list=[angulo_comp,V_ins,p_ins,t_ins]
+                #st.text(list)
+            writer.writerow(list)
+            angulo_comp=angulo_comp+1
+
+    def load_data(nrows):
+        data = pd.read_csv('compresion.csv', nrows=nrows)
+        return data
+        #data_load_state = st.text('Loading data...')
+    weekly_data = load_data(160)
+       #st.subheader('Volumen, Presión y Temperatura')
+        #st.write(weekly_data)
+    df=pd.DataFrame(weekly_data[:160], columns=['volumen'])
+    df1=pd.DataFrame(weekly_data[:160], columns=['presion'])
+    df2=pd.DataFrame(weekly_data[:160], columns=['temperatura'])
+        #Bar Chart
+    st.write('GRÁFICA VOLUMEN VS GRADO')
+    st.line_chart(df)
+    st.write('GRÁFICA PRESIÓN VS GRADO')
+    st.line_chart(df1)
+    st.write('GRÁFICA TEMPERATURA VS GRADO')
+    st.line_chart(df2)
+
+
+    
+        #PROCESO DE COMBUSTION
+    st.subheader('3. Proceso de Combustión')
+    alfa_comb=1.5
+    mc=190
+    gC=0.86
+    gH=0.13
+    gO=0.01
+    Lo=(1/0.21)*((gC/12)+(gH/4)-(gO/32))
+    #st.write('Lo es igual a', Lo)
+    M1=alfa_comb*Lo+(1/mc)
+    #st.write('Cantidad de mezcla es', M1, 'kmol/kg')
+    MO=0.21*(alfa_comb-1)*Lo
+    #st.write('Existen ', MO, '[kmol/kg] de oxígeno')
+    MN=0.79*alfa_comb
+    #st.write('Existen ', MN, '[Kmol/kg] de nitrógeno')
+    MCO2=gC/12
+    #st.write('Existen ', MCO2, '[kmol/kg]  de anhidrido carbónico')
+    MH2O=gH/2
+    #st.write('Existen ', MH2O, ' [kmol/Kg] de agua' )
+    M2=MO+MN+MCO2+MH2O
+    #st.write('Cantidad de mezcla 2 es', M2, 'kmol/kg')
+    delta_M=M2-M1
+    Uo_max=1+(delta_M/M1)
+    #st.write('Coeficiente de variación molecular es', Uo_max, '[kmol/kg]')
+    E_comb=1 #Efectividad de la combustion de un combustible es 1
+    Hi=42500 #Poder calorífica inferior del combustible en este caso diesel
+    qz=(E_comb*Hi)/(1+((1+Yr)*alfa_comb))
+    st.write('Calor específico total de la combustión es', qz, '[kJ/kg]')
+    E2=0.002*qz*(num_rc/Va)
+    #st.write('E2 es', E2)
+    I_D=13 #Tiempo de retardo
+    dia=0.116 #Relación estequiometrica
+    a=0.9
+    b=0.35
+    c=0.35
+    betha=1-((a**(dia**b))/(I_D**c))
+    #st.write('Beta es', betha, '[kJ/kg]')
+    c1=2
+    c2=5000
+    c3=6.908
+    c4=1.4
+    dt=55
+    dt_comb=75
+    t=dt/dt_comb
+    #st.write('tiempo es', t, 's')
+    f1=1-(1-(t**c1))**c2
+    #st.write('f1 es',f1)
+    f2=1-math.exp(-c3*(t**c4))
+    #st.write('f2 es', f2)
+    delta_X12=betha*f1+(1-betha)*f2
+    #st.write('Delta X12 es', delta_X12)
+    x12=delta_X12/2
+    t12=(Ta+Tc)/2
+    K12=1.259+(76.7/t12)-(0.005+(0.0375/alfa_comb)*x12)
+    #st.write('Factor de calores específicos', K12)
+    RBM=(2*num_lb)/num_lp
+    angulo_c=360
+    angulo_c1=(angulo_c*math.pi)/180
+    coef_ut1= 1+((num_rc-1)/2)*((1+(1/RBM))-(math.cos(angulo_c1)+(1/RBM)*math.sqrt(1-(RBM*RBM*(math.sin(angulo_c1))*(math.sin(angulo_c1))))))
+    #st.write('Coeficiente de utilización de calor en el punto 1 es', coef_ut1)
+    angulo_c2=415
+    angulo_c2=(angulo_c2*math.pi)/180
+    coef_ut2= 1+((num_rc-1)/2)*((1+(1/RBM))-(math.cos(angulo_c2)+(1/RBM)*math.sqrt(1-(RBM*RBM*(math.sin(angulo_c2))*(math.sin(angulo_c1))))))
+    #st.write('Coeficiente de utilización de calor en el punto 2 es', coef_ut2)
+    angulo_c3=340
+    angulo_c3=(angulo_c3*math.pi)/180
+    coef_ut3= 1+((num_rc-1)/2)*((1+(1/RBM))-(math.cos(angulo_c3)+(1/RBM)*math.sqrt(1-(RBM*RBM*(math.sin(angulo_c3))*(math.sin(angulo_c1))))))
+    #st.write('Coeficiente de utilización de calor en el punto de inflamación es', coef_ut3)
+    p2=(E2*delta_X12+Pa*(K12*coef_ut1-coef_ut2))/(K12*coef_ut2-coef_ut1)
+    st.write('Presión de combustión es', p2)
+
+
+
+    
+       #PROCESO DE ESCAPE
+    st.subheader('4. Proceso de Escape')
+
+
+
+
+
+
+    
 
 else:
     st.subheader('OBJETIVO DEL SIMULADOR')
